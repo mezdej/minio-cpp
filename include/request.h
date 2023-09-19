@@ -48,7 +48,7 @@ const std::regex AWS_S3_PREFIX_REGEX(AWS_S3_PREFIX,
 const std::regex REGION_REGEX("^((?!_)(?!-)[a-z_\\d-]{1,63})$",
                               std::regex_constants::icase);
 
-bool awsRegexMatch(std::string_view value, std::regex regex);
+bool awsRegexMatch(const std::string & value, std::regex regex);
 
 error::Error getAwsInfo(std::string host, bool https, std::string& region,
                         std::string& aws_s3_prefix,
@@ -115,7 +115,7 @@ struct Request {
   std::string bucket_name;
   std::string object_name;
 
-  std::string_view body = "";
+  std::string body;
 
   http::DataFunction datafunc = NULL;
   void* userdata = NULL;

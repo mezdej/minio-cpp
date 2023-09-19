@@ -37,7 +37,9 @@ int main(int argc, char* argv[]) {
   // Handle response.
   if (resp) {
     std::cout << "Object tags: " << std::endl;
-    for (auto& [key, value] : resp.tags) {
+    for (auto& data : resp.tags) {
+        auto& key = data.first;
+        auto& value = data.second;
       std::cout << "Key: " << key << ", "
                 << "Value: " << value << std::endl;
     }

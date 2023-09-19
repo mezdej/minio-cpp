@@ -388,7 +388,7 @@ minio::s3::PutObjectResponse minio::s3::Client::PutObject(
       }
     }
 
-    std::string_view data(buf, part_size);
+    std::string data(buf, part_size);
 
     uploaded_size += part_size;
 
@@ -428,11 +428,15 @@ minio::s3::PutObjectResponse minio::s3::Client::PutObject(
     up_args.upload_id = upload_id;
     up_args.part_number = part_number;
     up_args.data = data;
+
+    auto& progressfunc = args.progressfunc;
+    auto& progress_userdata = args.progress_userdata;
+
     if (args.progressfunc != NULL) {
       up_args.progressfunc =
-          [&object_size = object_size, &uploaded_bytes = uploaded_bytes,
-           &upload_speed = upload_speed, &progressfunc = args.progressfunc,
-           &progress_userdata = args.progress_userdata](
+          [&object_size, &uploaded_bytes,
+           &upload_speed , &progressfunc,
+           &progress_userdata](
               http::ProgressFunctionArgs args) -> void {
         if (args.upload_speed > 0) {
           if (upload_speed == -1) {
@@ -656,7 +660,7 @@ minio::s3::DownloadObjectResponse minio::s3::Client::DownloadObject(
   if (!args.version_id.empty()) {
     req.query_params.Add("versionId", args.version_id);
   }
-  req.datafunc = [&fout = fout](http::DataFunctionArgs args) -> bool {
+  req.datafunc = [&fout](http::DataFunctionArgs args) -> bool {
     fout << args.datachunk;
     return true;
   };
@@ -665,7 +669,7 @@ minio::s3::DownloadObjectResponse minio::s3::Client::DownloadObject(
 
   Response response = Execute(req);
   fout.close();
-  if (response) std::filesystem::rename(temp_filename, args.filename);
+  if (response) boost::filesystem::rename(temp_filename, args.filename);
   return response;
 }
 

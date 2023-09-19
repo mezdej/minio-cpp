@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
   minio::s3::SelectRequest request(expression, &csv_input, &csv_output);
 
   std::string records;
-  auto func = [&records = records](minio::s3::SelectResult result) -> bool {
+  auto func = [&records](minio::s3::SelectResult result) -> bool {
     if (result.err) {
       std::cout << "error occurred; " << result.err.String() << std::endl;
       return false;

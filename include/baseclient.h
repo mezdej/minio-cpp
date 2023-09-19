@@ -53,14 +53,14 @@ class BaseClient {
     ssl_cert_file_ = ssl_cert_file;
   }
 
-  error::Error SetAppInfo(std::string_view app_name,
-                          std::string_view app_version);
+  error::Error SetAppInfo(const std::string & app_name,
+                          const std::string & app_version);
 
   void HandleRedirectResponse(std::string& code, std::string& message,
                               int status_code, http::Method method,
                               utils::Multimap headers, std::string& bucket_name,
                               bool retry = false);
-  Response GetErrorResponse(http::Response resp, std::string_view resource,
+  Response GetErrorResponse(http::Response resp, const std::string & resource,
                             http::Method method, std::string& bucket_name,
                             std::string& object_name);
   Response execute(Request& req);

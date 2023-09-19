@@ -6,14 +6,8 @@
   "license": "Apache-2.0",
   "supports": "!windows & !osx & !uwp",
   "dependencies": [
+    "boost",
     "curlpp",
-    {
-      "name": "inih",
-      "features": [
-        "cpp"
-      ]
-    },
-    "nlohmann-json",
     "openssl",
     "pugixml",
     {

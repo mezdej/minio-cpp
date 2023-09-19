@@ -31,12 +31,12 @@ std::string GetCanonicalRequestHash(std::string& method, std::string& uri,
                                     std::string& content_sha256);
 std::string GetStringToSign(utils::Time& date, std::string& scope,
                             std::string& canonical_request_hash);
-std::string HmacHash(std::string_view key, std::string_view data);
+std::string HmacHash(const std::string & key, const std::string & data);
 std::string GetSigningKey(std::string& secret_key, utils::Time& date,
-                          std::string_view region,
-                          std::string_view service_name);
-std::string GetSignature(std::string_view signing_key,
-                         std::string_view string_to_sign);
+                          const std::string & region,
+                          const std::string & service_name);
+std::string GetSignature(const std::string & signing_key,
+                         const std::string & string_to_sign);
 std::string GetAuthorization(std::string& access_key, std::string& scope,
                              std::string& signed_headers,
                              std::string& signature);

@@ -17,7 +17,7 @@
 #define _MINIO_S3_TYPES_H
 
 #include <iostream>
-#include <nlohmann/json.hpp>
+#include "json.hpp"
 
 #include "utils.h"
 
@@ -26,159 +26,50 @@ namespace s3 {
 enum class RetentionMode { kGovernance, kCompliance };
 
 // StringToRetentionMode converts string to retention mode enum.
-RetentionMode StringToRetentionMode(std::string_view str) throw();
+RetentionMode StringToRetentionMode(const std::string & str) throw();
 
-constexpr bool IsRetentionModeValid(RetentionMode& retention) {
-  switch (retention) {
-    case RetentionMode::kGovernance:
-    case RetentionMode::kCompliance:
-      return true;
-  }
-  return false;
-}
+/*constexpr*/ bool IsRetentionModeValid( RetentionMode& retention );
 
 // RetentionModeToString converts retention mode enum to string.
-constexpr const char* RetentionModeToString(RetentionMode& retention) throw() {
-  switch (retention) {
-    case RetentionMode::kGovernance:
-      return "GOVERNANCE";
-    case RetentionMode::kCompliance:
-      return "COMPLIANCE";
-    default: {
-      std::cerr << "ABORT: Unknown retention mode. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* RetentionModeToString( RetentionMode& retention ) throw();
 
 enum class LegalHold { kOn, kOff };
 
 // StringToLegalHold converts string to legal hold enum.
-LegalHold StringToLegalHold(std::string_view str) throw();
+LegalHold StringToLegalHold(const std::string & str) throw();
 
-constexpr bool IsLegalHoldValid(LegalHold& legal_hold) {
-  switch (legal_hold) {
-    case LegalHold::kOn:
-    case LegalHold::kOff:
-      return true;
-  }
-  return false;
-}
+/*constexpr*/ bool IsLegalHoldValid( LegalHold& legal_hold );
 
 // LegalHoldToString converts legal hold enum to string.
-constexpr const char* LegalHoldToString(LegalHold& legal_hold) throw() {
-  switch (legal_hold) {
-    case LegalHold::kOn:
-      return "ON";
-    case LegalHold::kOff:
-      return "OFF";
-    default: {
-      std::cerr << "ABORT: Unknown legal hold. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* LegalHoldToString( LegalHold& legal_hold ) throw();
 
 enum class Directive { kCopy, kReplace };
 
 // StringToDirective converts string to directive enum.
-Directive StringToDirective(std::string_view str) throw();
+Directive StringToDirective(const std::string & str) throw();
 
 // DirectiveToString converts directive enum to string.
-constexpr const char* DirectiveToString(Directive& directive) throw() {
-  switch (directive) {
-    case Directive::kCopy:
-      return "COPY";
-    case Directive::kReplace:
-      return "REPLACE";
-    default: {
-      std::cerr << "ABORT: Unknown directive. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* DirectiveToString( Directive& directive ) throw();
 
 enum class CompressionType { kNone, kGZip, kBZip2 };
 
 // CompressionTypeToString converts compression type enum to string.
-constexpr const char* CompressionTypeToString(CompressionType& ctype) throw() {
-  switch (ctype) {
-    case CompressionType::kNone:
-      return "NONE";
-    case CompressionType::kGZip:
-      return "GZIP";
-    case CompressionType::kBZip2:
-      return "BZIP2";
-    default: {
-      std::cerr << "ABORT: Unknown compression type. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* CompressionTypeToString( CompressionType& ctype ) throw();
 
 enum class FileHeaderInfo { kUse, kIgnore, kNone };
 
 // FileHeaderInfoToString converts file header info enum to string.
-constexpr const char* FileHeaderInfoToString(FileHeaderInfo& info) throw() {
-  switch (info) {
-    case FileHeaderInfo::kUse:
-      return "USE";
-    case FileHeaderInfo::kIgnore:
-      return "IGNORE";
-    case FileHeaderInfo::kNone:
-      return "NONE";
-    default: {
-      std::cerr << "ABORT: Unknown file header info. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* FileHeaderInfoToString(FileHeaderInfo& info) throw();
 
 enum class JsonType { kDocument, kLines };
 
 // JsonTypeToString converts JSON type enum to string.
-constexpr const char* JsonTypeToString(JsonType& jtype) throw() {
-  switch (jtype) {
-    case JsonType::kDocument:
-      return "DOCUMENT";
-    case JsonType::kLines:
-      return "LINES";
-    default: {
-      std::cerr << "ABORT: Unknown JSON type. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* JsonTypeToString( JsonType& jtype ) throw();
 
 enum class QuoteFields { kAlways, kAsNeeded };
 
 // QuoteFieldsToString converts quote fields enum to string.
-constexpr const char* QuoteFieldsToString(QuoteFields& qtype) throw() {
-  switch (qtype) {
-    case QuoteFields::kAlways:
-      return "ALWAYS";
-    case QuoteFields::kAsNeeded:
-      return "ASNEEDED";
-    default: {
-      std::cerr << "ABORT: Unknown quote fields. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* QuoteFieldsToString( QuoteFields& qtype ) throw();
 
 struct CsvInputSerialization {
   CompressionType* compression_type = NULL;
@@ -384,14 +275,14 @@ struct FilterValue {
 };  // struct FilterValue
 
 struct PrefixFilterRule : public FilterValue {
-  static constexpr const char* name = "prefix";
+  //static /*constexpr*/ const char* name = "prefix";
 
   PrefixFilterRule() {}
   PrefixFilterRule(std::string value) : FilterValue(value) {}
 };  // struct PrefixFilterRule
 
 struct SuffixFilterRule : public FilterValue {
-  static constexpr const char* name = "suffix";
+  //static /*constexpr*/ const char* name = "suffix";
 
   SuffixFilterRule() {}
   SuffixFilterRule(std::string value) : FilterValue(value) {}

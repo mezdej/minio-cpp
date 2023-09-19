@@ -147,8 +147,7 @@ class Tests {
     }
 
     std::list<minio::s3::DeleteObject>::iterator i = delete_objects.begin();
-    args.func = [&delete_objects = delete_objects,
-                 &i = i](minio::s3::DeleteObject& object) -> bool {
+    args.func = [&delete_objects,&i](minio::s3::DeleteObject& object) -> bool {
       if (i == delete_objects.end()) return false;
       object = *i;
       i++;
@@ -333,7 +332,7 @@ class Tests {
         throw std::runtime_error("DownloadObject(): expected: " + data +
                                  "; got: " + buf);
       }
-      std::filesystem::remove(filename);
+      boost::filesystem::remove(filename);
       RemoveObject(bucket_name_, object_name);
     } catch (const std::runtime_error& err) {
       RemoveObject(bucket_name_, object_name);
@@ -362,7 +361,7 @@ class Tests {
       args.object = object_name;
       std::string content;
       args.datafunc =
-          [&content = content](minio::http::DataFunctionArgs args) -> bool {
+          [&content](minio::http::DataFunctionArgs args) -> bool {
         content += args.datachunk;
         return true;
       };
@@ -517,7 +516,7 @@ class Tests {
     if (!resp) {
       throw std::runtime_error("UploadObject(): " + resp.Error().String());
     }
-    std::filesystem::remove(filename);
+    boost::filesystem::remove(filename);
     RemoveObject(bucket_name_, object_name);
   }
 
@@ -575,7 +574,7 @@ class Tests {
 
     try {
       std::string records;
-      auto func = [&records = records](minio::s3::SelectResult result) -> bool {
+      auto func = [&records](minio::s3::SelectResult result) -> bool {
         if (result.err) {
           throw std::runtime_error("SelectResult: " + result.err.String());
           return false;
@@ -606,11 +605,10 @@ class Tests {
     std::cout << "ListenBucketNotification()" << std::endl;
 
     std::list<minio::s3::NotificationRecord> records;
-    std::thread task{[&client_ = client_, &bucket_name_ = bucket_name_,
-                      &records = records]() {
+    std::thread task{[this,&records]() {
       minio::s3::ListenBucketNotificationArgs args;
       args.bucket = bucket_name_;
-      args.func = [&records = records](
+      args.func = [&records](
                       std::list<minio::s3::NotificationRecord> values) -> bool {
         records.insert(records.end(), values.begin(), values.end());
         return false;

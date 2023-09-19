@@ -16,8 +16,8 @@
 #ifndef _MINIO_S3_ARGS_H
 #define _MINIO_S3_ARGS_H
 
-#include <filesystem>
-#include <nlohmann/json.hpp>
+#include <boost/filesystem.hpp>
+#include "json.hpp"
 
 #include "http.h"
 #include "signer.h"
@@ -112,7 +112,7 @@ struct PutObjectBaseArgs : public ObjectWriteArgs {
 };  // struct PutObjectBaseArgs
 
 struct PutObjectApiArgs : public PutObjectBaseArgs {
-  std::string_view data;
+  std::string data;
   utils::Multimap query_params;
   http::ProgressFunction progressfunc = NULL;
   void *progress_userdata = NULL;
@@ -121,7 +121,7 @@ struct PutObjectApiArgs : public PutObjectBaseArgs {
 struct UploadPartArgs : public ObjectWriteArgs {
   std::string upload_id;
   unsigned int part_number;
-  std::string_view data;
+  std::string data;
   http::ProgressFunction progressfunc = NULL;
   void *progress_userdata = NULL;
 
@@ -389,12 +389,11 @@ struct SetObjectRetentionArgs : public ObjectVersionArgs {
   error::Error Validate();
 };  // struct SetObjectRetention
 
-inline constexpr unsigned int kDefaultExpirySeconds =
-    (60 * 60 * 24 * 7);  // 7 days
+/*constexpr*/ const unsigned int kDefaultExpirySeconds = (60 * 60 * 24 * 7);  // 7 days
 
 struct GetPresignedObjectUrlArgs : public ObjectVersionArgs {
   http::Method method;
-  unsigned int expiry_seconds = kDefaultExpirySeconds;
+  unsigned int expiry_seconds = (60 * 60 * 24 * 7);
   utils::Time request_time;
 
   error::Error Validate();
@@ -497,8 +496,12 @@ struct PostPolicy {
 
     nlohmann::json conditions = nlohmann::json::array();
     conditions.push_back({eq_, "$bucket", bucket});
-    for (auto &[cond_key, cond] : conditions_) {
-      for (auto &[key, value] : cond) {
+    for (auto & condition : conditions_) {
+        auto& cond_key = condition.first;
+        auto& cond = condition.second;
+      for (auto & kv : cond) {
+          auto& key = kv.first;
+          auto& value = kv.second;
         conditions.push_back({cond_key, "$" + key, value});
       }
     }
@@ -534,9 +537,9 @@ struct PostPolicy {
   }
 
  private:
-  static constexpr const char *eq_ = "eq";
-  static constexpr const char *starts_with_ = "starts-with";
-  static constexpr const char *algorithm_ = "AWS4-HMAC-SHA256";
+     static /*constexpr*/ const char* eq_;// = "eq";
+     static /*constexpr*/ const char* starts_with_;// = "starts-with";
+     static /*constexpr*/ const char* algorithm_;// = "AWS4-HMAC-SHA256";
 
   utils::Time expiration_;
   std::map<std::string, std::map<std::string, std::string>> conditions_;

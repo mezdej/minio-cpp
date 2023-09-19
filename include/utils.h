@@ -40,11 +40,11 @@
 
 namespace minio {
 namespace utils {
-inline constexpr unsigned int kMaxMultipartCount = 10000;  // 10000 parts
-inline constexpr unsigned long kMaxObjectSize =
+const /*constexpr*/ unsigned int kMaxMultipartCount = 10000;  // 10000 parts
+const /*constexpr*/ unsigned long kMaxObjectSize =
     5L * 1024 * 1024 * 1024 * 1024;                                     // 5TiB
-inline constexpr unsigned long kMaxPartSize = 5L * 1024 * 1024 * 1024;  // 5GiB
-inline constexpr unsigned int kMinPartSize = 5 * 1024 * 1024;           // 5MiB
+const /*constexpr*/ unsigned long kMaxPartSize = 5L * 1024 * 1024 * 1024;  // 5GiB
+const /*constexpr*/ unsigned int kMinPartSize = 5 * 1024 * 1024;           // 5MiB
 
 bool GetEnv(std::string& var, const char* name);
 
@@ -52,9 +52,9 @@ std::string GetHomeDir();
 
 std::string Printable(std::string s);
 
-unsigned long CRC32(std::string_view str);
+unsigned long CRC32(const std::string & str);
 
-unsigned int Int(std::string_view str);
+unsigned int Int(const std::string & str);
 
 // FormatTime formats time as per format.
 std::string FormatTime(const std::tm* time, const char* format);
@@ -66,26 +66,26 @@ bool StringToBool(std::string str);
 inline const char* const BoolToString(bool b) { return b ? "true" : "false"; }
 
 // Trim trims leading and trailing character of a string.
-std::string Trim(std::string_view str, char ch = ' ');
+std::string Trim(const std::string & str, char ch = ' ');
 
 // CheckNonemptystring checks whether string is not empty after trimming
 // whitespaces.
-bool CheckNonEmptyString(std::string_view str);
+bool CheckNonEmptyString(const std::string & str);
 
 // ToLower converts string to lower case.
 std::string ToLower(std::string str);
 
 // StartsWith returns whether str starts with prefix or not.
-bool StartsWith(std::string_view str, std::string_view prefix);
+bool StartsWith(const std::string & str, const std::string & prefix);
 
 // EndsWith returns whether str ends with suffix or not.
-bool EndsWith(std::string_view str, std::string_view suffix);
+bool EndsWith(const std::string & str, const std::string & suffix);
 
 // Contains returns whether str has ch.
-bool Contains(std::string_view str, char ch);
+bool Contains(const std::string & str, char ch);
 
 // Contains returns whether str has substr.
-bool Contains(std::string_view str, std::string_view substr);
+bool Contains(const std::string & str, const std::string & substr);
 
 // Join returns a string of joined values by delimiter.
 std::string Join(std::list<std::string> values, std::string delimiter);
@@ -97,15 +97,15 @@ std::string Join(std::vector<std::string> values, std::string delimiter);
 std::string EncodePath(std::string& path);
 
 // Sha256hash computes SHA-256 of data and return hash as hex encoded value.
-std::string Sha256Hash(std::string_view str);
+std::string Sha256Hash(const std::string & str);
 
 // Base64Encode encodes string to base64.
-std::string Base64Encode(std::string_view str);
+std::string Base64Encode(const std::string & str);
 
 // Md5sumHash computes MD5 of data and return hash as Base64 encoded value.
-std::string Md5sumHash(std::string_view str);
+std::string Md5sumHash(const std::string & str);
 
-error::Error CheckBucketName(std::string_view bucket_name, bool strict = false);
+error::Error CheckBucketName(const std::string & bucket_name, bool strict = false);
 error::Error ReadPart(std::istream& stream, char* buf, size_t size,
                       size_t& bytes_read);
 error::Error CalcPartInfo(long object_size, size_t& part_size,
@@ -176,11 +176,11 @@ class Multimap {
 
   operator bool() const { return !map_.empty(); }
 
-  bool Contains(std::string_view key);
+  bool Contains(const std::string & key);
 
-  std::list<std::string> Get(std::string_view key);
+  std::list<std::string> Get(const std::string & key);
 
-  std::string GetFront(std::string_view key);
+  std::string GetFront(const std::string & key);
 
   std::list<std::string> Keys();
 

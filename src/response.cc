@@ -15,7 +15,7 @@
 
 #include "response.h"
 
-minio::s3::Response minio::s3::Response::ParseXML(std::string_view data,
+minio::s3::Response minio::s3::Response::ParseXML(const std::string & data,
                                                   int status_code,
                                                   utils::Multimap headers) {
   Response resp;
@@ -57,7 +57,7 @@ minio::s3::Response minio::s3::Response::ParseXML(std::string_view data,
 }
 
 minio::s3::ListBucketsResponse minio::s3::ListBucketsResponse::ParseXML(
-    std::string_view data) {
+    const std::string & data) {
   std::list<Bucket> buckets;
 
   pugi::xml_document xdoc;
@@ -83,7 +83,7 @@ minio::s3::ListBucketsResponse minio::s3::ListBucketsResponse::ParseXML(
 }
 
 minio::s3::CompleteMultipartUploadResponse
-minio::s3::CompleteMultipartUploadResponse::ParseXML(std::string_view data,
+minio::s3::CompleteMultipartUploadResponse::ParseXML(const std::string & data,
                                                      std::string version_id) {
   CompleteMultipartUploadResponse resp;
 
@@ -113,7 +113,7 @@ minio::s3::CompleteMultipartUploadResponse::ParseXML(std::string_view data,
 }
 
 minio::s3::ListObjectsResponse minio::s3::ListObjectsResponse::ParseXML(
-    std::string_view data, bool version) {
+    const std::string & data, bool version) {
   ListObjectsResponse resp;
 
   pugi::xml_document xdoc;
@@ -200,7 +200,7 @@ minio::s3::ListObjectsResponse minio::s3::ListObjectsResponse::ParseXML(
 
   Item last_item;
 
-  auto populate = [&resp = resp, &last_item = last_item](
+  auto populate = [&resp, &last_item](
                       std::list<Item>& items, pugi::xpath_node_set& contents,
                       bool is_delete_marker) -> void {
     for (auto content : contents) {
@@ -280,7 +280,7 @@ minio::s3::ListObjectsResponse minio::s3::ListObjectsResponse::ParseXML(
 }
 
 minio::s3::RemoveObjectsResponse minio::s3::RemoveObjectsResponse::ParseXML(
-    std::string_view data) {
+    const std::string & data) {
   RemoveObjectsResponse resp;
 
   pugi::xml_document xdoc;
@@ -336,7 +336,7 @@ minio::s3::RemoveObjectsResponse minio::s3::RemoveObjectsResponse::ParseXML(
 }
 
 minio::s3::GetBucketNotificationResponse
-minio::s3::GetBucketNotificationResponse::ParseXML(std::string_view data) {
+minio::s3::GetBucketNotificationResponse::ParseXML(const std::string & data) {
   minio::s3::NotificationConfig config;
 
   pugi::xml_document xdoc;
@@ -430,7 +430,7 @@ minio::s3::GetBucketNotificationResponse::ParseXML(std::string_view data) {
 }
 
 minio::s3::GetBucketEncryptionResponse
-minio::s3::GetBucketEncryptionResponse::ParseXML(std::string_view data) {
+minio::s3::GetBucketEncryptionResponse::ParseXML(const std::string & data) {
   SseConfig config;
 
   pugi::xml_document xdoc;
@@ -451,7 +451,7 @@ minio::s3::GetBucketEncryptionResponse::ParseXML(std::string_view data) {
 }
 
 minio::s3::GetBucketReplicationResponse
-minio::s3::GetBucketReplicationResponse::ParseXML(std::string_view data) {
+minio::s3::GetBucketReplicationResponse::ParseXML(const std::string & data) {
   ReplicationConfig config;
 
   pugi::xml_document xdoc;
@@ -613,7 +613,7 @@ minio::s3::GetBucketReplicationResponse::ParseXML(std::string_view data) {
 }
 
 minio::s3::GetBucketLifecycleResponse
-minio::s3::GetBucketLifecycleResponse::ParseXML(std::string_view data) {
+minio::s3::GetBucketLifecycleResponse::ParseXML(const std::string & data) {
   LifecycleConfig config;
 
   pugi::xml_document xdoc;
@@ -739,7 +739,7 @@ minio::s3::GetBucketLifecycleResponse::ParseXML(std::string_view data) {
 }
 
 minio::s3::GetBucketTagsResponse minio::s3::GetBucketTagsResponse::ParseXML(
-    std::string_view data) {
+    const std::string & data) {
   std::map<std::string, std::string> map;
 
   pugi::xml_document xdoc;
@@ -764,7 +764,7 @@ minio::s3::GetBucketTagsResponse minio::s3::GetBucketTagsResponse::ParseXML(
 }
 
 minio::s3::GetObjectTagsResponse minio::s3::GetObjectTagsResponse::ParseXML(
-    std::string_view data) {
+    const std::string & data) {
   std::map<std::string, std::string> map;
 
   pugi::xml_document xdoc;

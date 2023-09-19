@@ -44,9 +44,12 @@ int main(int argc, char* argv[]) {
                 << minio::utils::BoolToString(item.is_delete_marker)
                 << std::endl;
       std::cout << "User Metadata: " << std::endl;
-      for (auto& [key, value] : item.user_metadata) {
-        std::cout << "  " << key << ": " << value << std::endl;
-      }
+	  for( auto& data : item.user_metadata )
+	  {
+		  auto& key = data.first;
+		  auto& value = data.second;
+		  std::cout << "  " << key << ": " << value << std::endl;
+	  }
       std::cout << "Owner ID: " << item.owner_id << std::endl;
       std::cout << "Owner Name: " << item.owner_name << std::endl;
       std::cout << "Storage Class: " << item.storage_class << std::endl;

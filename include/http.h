@@ -29,31 +29,19 @@ namespace http {
 enum class Method { kGet, kHead, kPost, kPut, kDelete };
 
 // MethodToString converts http Method enum to string.
-constexpr const char* MethodToString(Method& method) throw() {
-  switch (method) {
-    case Method::kGet:
-      return "GET";
-    case Method::kHead:
-      return "HEAD";
-    case Method::kPost:
-      return "POST";
-    case Method::kPut:
-      return "PUT";
-    case Method::kDelete:
-      return "DELETE";
-    default: {
-      std::cerr << "ABORT: Unimplemented HTTP method. This should not happen."
-                << std::endl;
-      std::terminate();
-    }
-  }
-  return NULL;
-}
+/*constexpr*/ const char* MethodToString( Method& method ) throw();
 
 /**
  * Url represents HTTP URL and it's components.
  */
-struct Url {
+struct Url
+{
+    Url() = default;
+    Url( bool _https, std::string _host, unsigned int _port, std::string _path, std::string _query_string )
+        : https( _https), host(std::move(_host)), port(_port), path(std::move(_path)), query_string(std::move(_query_string))
+    {}
+    ~Url() = default;
+
   bool https;
   std::string host;
   unsigned int port = 0;
@@ -163,6 +151,11 @@ using ProgressFunction = std::function<void(ProgressFunctionArgs)>;
 struct Response;
 
 struct DataFunctionArgs {
+    DataFunctionArgs() = default;
+    DataFunctionArgs( curlpp::Easy* handle_, Response* response_, std::string datachunk_, void* userdata_ )
+        : handle( handle_ ), response( response_ ), datachunk( datachunk_ ), userdata( userdata_ )
+    {}
+        
   curlpp::Easy* handle = NULL;
   Response* response = NULL;
   std::string datachunk;
@@ -183,7 +176,7 @@ struct Request {
   Method method;
   http::Url url;
   utils::Multimap headers;
-  std::string_view body = "";
+  std::string body;
   DataFunction datafunc = NULL;
   void* userdata = NULL;
   ProgressFunction progressfunc = NULL;

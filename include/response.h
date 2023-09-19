@@ -69,7 +69,7 @@ struct Response {
     return error::SUCCESS;
   }
 
-  static Response ParseXML(std::string_view data, int status_code,
+  static Response ParseXML(const std::string & data, int status_code,
                            utils::Multimap headers);
 
  private:
@@ -97,7 +97,7 @@ struct ListBucketsResponse : public Response {
 
   ListBucketsResponse(const Response& resp) : Response(resp) {}
 
-  static ListBucketsResponse ParseXML(std::string_view data);
+  static ListBucketsResponse ParseXML(const std::string & data);
 };  // struct ListBucketsResponse
 
 struct BucketExistsResponse : public Response {
@@ -125,7 +125,7 @@ struct CompleteMultipartUploadResponse : public Response {
 
   CompleteMultipartUploadResponse(const Response& resp) : Response(resp) {}
 
-  static CompleteMultipartUploadResponse ParseXML(std::string_view data,
+  static CompleteMultipartUploadResponse ParseXML(const std::string & data,
                                                   std::string version_id);
 };  // struct CompleteMultipartUploadResponse
 
@@ -234,7 +234,7 @@ struct ListObjectsResponse : public Response {
 
   ListObjectsResponse(const Response& resp) : Response(resp) {}
 
-  static ListObjectsResponse ParseXML(std::string_view data, bool version);
+  static ListObjectsResponse ParseXML(const std::string & data, bool version);
 };  // struct ListObjectsResponse
 
 using CopyObjectResponse = PutObjectResponse;
@@ -270,7 +270,7 @@ struct RemoveObjectsResponse : public Response {
 
   RemoveObjectsResponse(const Response& resp) : Response(resp) {}
 
-  static RemoveObjectsResponse ParseXML(std::string_view data);
+  static RemoveObjectsResponse ParseXML(const std::string & data);
 };  // struct RemoveObjectsResponse
 
 using SelectObjectContentResponse = Response;
@@ -304,7 +304,7 @@ struct GetBucketNotificationResponse : public Response {
 
   GetBucketNotificationResponse(const Response& resp) : Response(resp) {}
 
-  static GetBucketNotificationResponse ParseXML(std::string_view data);
+  static GetBucketNotificationResponse ParseXML(const std::string & data);
 };  // struct GetBucketNotificationResponse
 
 using SetBucketNotificationResponse = Response;
@@ -320,7 +320,7 @@ struct GetBucketEncryptionResponse : public Response {
 
   GetBucketEncryptionResponse(const Response& resp) : Response(resp) {}
 
-  static GetBucketEncryptionResponse ParseXML(std::string_view data);
+  static GetBucketEncryptionResponse ParseXML(const std::string & data);
 };  // struct GetBucketEncryptionResponse
 
 using SetBucketEncryptionResponse = Response;
@@ -360,7 +360,7 @@ struct GetBucketReplicationResponse : public Response {
 
   GetBucketReplicationResponse(const Response& resp) : Response(resp) {}
 
-  static GetBucketReplicationResponse ParseXML(std::string_view data);
+  static GetBucketReplicationResponse ParseXML(const std::string & data);
 };  // struct GetBucketReplicationResponse
 
 using SetBucketReplicationResponse = Response;
@@ -376,7 +376,7 @@ struct GetBucketLifecycleResponse : public Response {
 
   GetBucketLifecycleResponse(const Response& resp) : Response(resp) {}
 
-  static GetBucketLifecycleResponse ParseXML(std::string_view data);
+  static GetBucketLifecycleResponse ParseXML(const std::string & data);
 };  // struct GetBucketLifecycleResponse
 
 using SetBucketLifecycleResponse = Response;
@@ -394,7 +394,7 @@ struct GetBucketTagsResponse : public Response {
 
   GetBucketTagsResponse(const Response& resp) : Response(resp) {}
 
-  static GetBucketTagsResponse ParseXML(std::string_view data);
+  static GetBucketTagsResponse ParseXML(const std::string & data);
 };  // struct GetBucketTagsResponse
 
 using SetBucketTagsResponse = Response;
@@ -428,7 +428,7 @@ struct GetObjectTagsResponse : public Response {
 
   GetObjectTagsResponse(const Response& resp) : Response(resp) {}
 
-  static GetObjectTagsResponse ParseXML(std::string_view data);
+  static GetObjectTagsResponse ParseXML(const std::string & data);
 };  // struct GetObjectTagsResponse
 
 using SetObjectTagsResponse = Response;

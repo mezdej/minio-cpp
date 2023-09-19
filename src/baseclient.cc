@@ -38,7 +38,7 @@ minio::s3::BaseClient::BaseClient(BaseUrl& base_url, creds::Provider* provider)
 }
 
 minio::error::Error minio::s3::BaseClient::SetAppInfo(
-    std::string_view app_name, std::string_view app_version) {
+    const std::string & app_name, const std::string & app_version) {
   if (app_name.empty() || app_version.empty()) {
     return error::Error("Application name/version cannot be empty");
   }
@@ -85,7 +85,7 @@ void minio::s3::BaseClient::HandleRedirectResponse(
 }
 
 minio::s3::Response minio::s3::BaseClient::GetErrorResponse(
-    http::Response resp, std::string_view resource, http::Method method,
+    http::Response resp, const std::string & resource, http::Method method,
     std::string& bucket_name, std::string& object_name) {
   if (!resp.error.empty()) return error::Error(resp.error);
 
@@ -1053,10 +1053,9 @@ minio::s3::BaseClient::ListenBucketNotification(
 
   std::string data;
   auto func = args.func;
-  req.datafunc = [&func = func,
-                  &data = data](http::DataFunctionArgs args) -> bool {
-    data += args.datachunk;
+  req.datafunc = [&func, &data](http::DataFunctionArgs args) -> bool {
     while (true) {
+      data += args.datachunk;
       size_t pos = data.find('\n');
       if (pos == std::string::npos) return true;
       std::string line = data.substr(0, pos);
@@ -1488,7 +1487,9 @@ minio::s3::SetBucketTagsResponse minio::s3::BaseClient::SetBucketTags(
   ss << "<Tagging>";
   if (!args.tags.empty()) {
     ss << "<TagSet>";
-    for (auto& [key, value] : args.tags) {
+    for (auto& tag : args.tags) {
+        auto& key = tag.first;
+        auto & value = tag.second;
       ss << "<Tag>"
          << "<Key>" << key << "</Key>"
          << "<Value>" << value << "</Value>"
@@ -1637,7 +1638,10 @@ minio::s3::SetObjectTagsResponse minio::s3::BaseClient::SetObjectTags(
   ss << "<Tagging>";
   if (!args.tags.empty()) {
     ss << "<TagSet>";
-    for (auto& [key, value] : args.tags) {
+    for (auto& tag: args.tags) {
+        auto& key = tag.first;
+        auto& value = tag.second;
+
       ss << "<Tag>"
          << "<Key>" << key << "</Key>"
          << "<Value>" << value << "</Value>"
@@ -1749,7 +1753,7 @@ minio::s3::UploadPartResponse minio::s3::BaseClient::UploadPart(
   api_args.bucket = args.bucket;
   api_args.region = args.region;
   api_args.object = args.object;
-  api_args.data = args.data;
+  api_args.data = std::move(args.data);
   api_args.progressfunc = args.progressfunc;
   api_args.progress_userdata = args.progress_userdata;
   api_args.query_params = query_params;

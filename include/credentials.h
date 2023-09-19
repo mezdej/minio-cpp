@@ -46,7 +46,7 @@ struct Credentials {
     return !err && !access_key.empty() && expired(expiration);
   }
 
-  static Credentials ParseXML(std::string_view data, std::string root) {
+  static Credentials ParseXML(const std::string & data, std::string root) {
     pugi::xml_document xdoc;
     pugi::xml_parse_result result = xdoc.load_string(data.data());
     if (!result) return Credentials{error::Error("unable to parse XML")};

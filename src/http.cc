@@ -17,6 +17,34 @@
 
 #include <curlpp/Infos.hpp>
 
+namespace minio {
+    namespace http {
+        /*constexpr*/ const char* MethodToString( Method& method ) throw()
+        {
+            switch( method )
+            {
+            case Method::kGet:
+                return "GET";
+            case Method::kHead:
+                return "HEAD";
+            case Method::kPost:
+                return "POST";
+            case Method::kPut:
+                return "PUT";
+            case Method::kDelete:
+                return "DELETE";
+            default:
+            {
+                std::cerr << "ABORT: Unimplemented HTTP method. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+    }//http
+}//minio
+
 minio::error::Error minio::http::Response::ReadStatusCode() {
   size_t pos = response_.find("\r\n");
   if (pos == std::string::npos) {
@@ -88,7 +116,7 @@ minio::error::Error minio::http::Response::ReadHeaders() {
   std::string lines = response_.substr(0, pos);
   response_.erase(0, pos + 4);
 
-  auto add_header = [&headers = headers](std::string line) -> error::Error {
+  auto add_header = [this](std::string line) -> error::Error {
     size_t pos = line.find(": ");
     if (pos != std::string::npos) {
       headers.Add(line.substr(0, pos), line.substr(pos + 2));
@@ -148,7 +176,7 @@ size_t minio::http::Response::ResponseCallback(curlpp::Multi *requests,
 
     // If data function is set and the request is successful, send data.
     if (datafunc != NULL && status_code >= 200 && status_code <= 299) {
-      DataFunctionArgs args{request, this, response_, userdata};
+        DataFunctionArgs args( request, this, response_, userdata );
       if (!datafunc(args)) requests->remove(request);
     } else {
       body = response_;
@@ -159,7 +187,7 @@ size_t minio::http::Response::ResponseCallback(curlpp::Multi *requests,
 
   // If data function is set and the request is successful, send data.
   if (datafunc != NULL && status_code >= 200 && status_code <= 299) {
-    DataFunctionArgs args{request, this, std::string(buffer, length), userdata};
+    DataFunctionArgs args(request, this, std::string(buffer, length), userdata);
     if (!datafunc(args)) requests->remove(request);
   } else {
     body += std::string(buffer, length);
@@ -184,24 +212,24 @@ minio::http::Response minio::http::Request::execute() {
 
   // Request settings.
   request.setOpt(
-      new curlpp::options::CustomRequest{http::MethodToString(method)});
+      curlpp::options::CustomRequest{http::MethodToString(method)});
   std::string urlstring = url.String();
-  request.setOpt(new curlpp::Options::Url(urlstring));
-  if (debug) request.setOpt(new curlpp::Options::Verbose(true));
+  request.setOpt(curlpp::Options::Url(urlstring));
+  if (debug) request.setOpt(curlpp::Options::Verbose(true));
   if (ignore_cert_check) {
-    request.setOpt(new curlpp::Options::SslVerifyPeer(false));
+    request.setOpt(curlpp::Options::SslVerifyPeer(false));
   }
 
   if (url.https) {
     if (!ssl_cert_file.empty()) {
-      request.setOpt(new curlpp::Options::SslVerifyPeer(true));
-      request.setOpt(new curlpp::Options::CaInfo(ssl_cert_file));
+      request.setOpt(curlpp::Options::SslVerifyPeer(true));
+      request.setOpt(curlpp::Options::CaInfo(ssl_cert_file));
     }
     if (!key_file.empty()) {
-      request.setOpt(new curlpp::Options::SslKey(key_file));
+      request.setOpt(curlpp::Options::SslKey(key_file));
     }
     if (!cert_file.empty()) {
-      request.setOpt(new curlpp::Options::SslCert(cert_file));
+      request.setOpt(curlpp::Options::SslCert(cert_file));
     }
   }
 
@@ -213,37 +241,37 @@ minio::http::Response minio::http::Request::execute() {
     case Method::kGet:
       break;
     case Method::kHead:
-      request.setOpt(new curlpp::options::NoBody(true));
+      request.setOpt(curlpp::options::NoBody(true));
       break;
     case Method::kPut:
     case Method::kPost:
       if (!headers.Contains("Content-Length")) {
         headers.Add("Content-Length", std::to_string(body.size()));
       }
-      request.setOpt(new curlpp::Options::ReadStream(&body_stream));
-      request.setOpt(new curlpp::Options::InfileSize(body.size()));
-      request.setOpt(new curlpp::Options::Upload(true));
+      request.setOpt(curlpp::Options::ReadStream(&body_stream));
+      request.setOpt(curlpp::Options::InfileSize(body.size()));
+      request.setOpt(curlpp::Options::Upload(true));
       break;
   }
 
   std::list<std::string> headerlist = headers.ToHttpHeaders();
   headerlist.push_back("Expect:");  // Disable 100 continue from server.
-  request.setOpt(new curlpp::Options::HttpHeader(headerlist));
+  request.setOpt(curlpp::Options::HttpHeader(headerlist));
 
   // Response settings.
-  request.setOpt(new curlpp::options::Header(true));
+  request.setOpt(curlpp::options::Header(true));
 
   Response response;
   response.datafunc = datafunc;
   response.userdata = userdata;
 
   using namespace std::placeholders;
-  request.setOpt(new curlpp::options::WriteFunction(
+  request.setOpt(curlpp::options::WriteFunction(
       std::bind(&Response::ResponseCallback, &response, &requests, &request, _1,
                 _2, _3)));
 
   auto progress =
-      [&progressfunc = progressfunc, &progress_userdata = progress_userdata](
+      [this](
           double dltotal, double dlnow, double ultotal, double ulnow) -> int {
     ProgressFunctionArgs args;
     args.download_total_bytes = dltotal;
@@ -255,8 +283,8 @@ minio::http::Response minio::http::Request::execute() {
     return CURL_PROGRESSFUNC_CONTINUE;
   };
   if (progressfunc != NULL) {
-    request.setOpt(new curlpp::options::NoProgress(false));
-    request.setOpt(new curlpp::options::ProgressFunction(progress));
+    request.setOpt(curlpp::options::NoProgress(false));
+    request.setOpt(curlpp::options::ProgressFunction(progress));
   }
 
   int left = 0;

@@ -36,8 +36,7 @@ int main(int argc, char* argv[]) {
   objects.push_back(minio::s3::DeleteObject{"my-object3"});
   std::list<minio::s3::DeleteObject>::iterator i = objects.begin();
 
-  args.func = [&objects = objects,
-               &i = i](minio::s3::DeleteObject& obj) -> bool {
+  args.func = [&objects,&i](minio::s3::DeleteObject& obj) -> bool {
     if (i == objects.end()) return false;
     obj = *i;
     i++;

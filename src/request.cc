@@ -18,7 +18,7 @@
 #define EMPTY_SHA256 \
   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
-bool minio::s3::awsRegexMatch(std::string_view value, std::regex regex) {
+bool minio::s3::awsRegexMatch(const std::string & value, std::regex regex) {
   if (!std::regex_search(value.data(), regex)) return false;
 
   std::stringstream str_stream(value.data());
@@ -174,19 +174,19 @@ void minio::s3::BaseUrl::BuildListBucketsUrl(http::Url& url,
   url.host = s3_prefix + region + "." + domain_suffix;
 }
 
-minio::error::Error minio::s3::BaseUrl::BuildUrl(http::Url& url,
-                                                 http::Method method,
-                                                 std::string region,
-                                                 utils::Multimap query_params,
-                                                 std::string bucket_name,
-                                                 std::string object_name) {
-  if (err_) return err_;
+minio::error::Error minio::s3::BaseUrl::BuildUrl( http::Url& url,
+    http::Method method,
+    std::string region,
+    utils::Multimap query_params,
+    std::string bucket_name,
+    std::string object_name ) {
+    if( err_ ) return err_;
 
-  if (bucket_name.empty() && !object_name.empty()) {
-    return error::Error("empty bucket name for object name " + object_name);
-  }
+    if( bucket_name.empty() && !object_name.empty() ) {
+        return error::Error( "empty bucket name for object name " + object_name );
+    }
 
-  url = http::Url{https, host, port, "/", query_params.ToQueryString()};
+    url = http::Url( https, host, port, "/", query_params.ToQueryString() );
 
   if (bucket_name.empty()) {
     this->BuildListBucketsUrl(url, region);

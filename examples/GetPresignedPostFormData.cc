@@ -40,7 +40,13 @@ int main(int argc, char* argv[]) {
   // Handle response.
   if (resp) {
     std::string fields;
-    for (auto& [key, value] : resp.form_data) fields += key + "=" + value + " ";
+    for( auto& data : resp.form_data )
+    {
+        auto& key = data.first;
+        auto & value = data.second;
+        fields += key + "=" + value + " ";
+    }
+
     fields += "-F file=@<FILE>";
     std::cout << "Example CURL command to use form-data:" << std::endl
               << "curl -X POST https://play.min.io/my-bucket " << fields

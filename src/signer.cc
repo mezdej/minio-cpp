@@ -47,8 +47,8 @@ std::string minio::signer::GetStringToSign(
          canonical_request_hash;
 }
 
-std::string minio::signer::HmacHash(std::string_view key,
-                                    std::string_view data) {
+std::string minio::signer::HmacHash(const std::string & key,
+                                    const std::string & data) {
   std::array<unsigned char, EVP_MAX_MD_SIZE> hash;
   unsigned int hash_len;
 
@@ -61,16 +61,16 @@ std::string minio::signer::HmacHash(std::string_view key,
 
 std::string minio::signer::GetSigningKey(std::string& secret_key,
                                          utils::Time& date,
-                                         std::string_view region,
-                                         std::string_view service_name) {
+                                         const std::string & region,
+                                         const std::string & service_name) {
   std::string date_key = HmacHash("AWS4" + secret_key, date.ToSignerDate());
   std::string date_region_key = HmacHash(date_key, region);
   std::string date_region_service_key = HmacHash(date_region_key, service_name);
   return HmacHash(date_region_service_key, "aws4_request");
 }
 
-std::string minio::signer::GetSignature(std::string_view signing_key,
-                                        std::string_view string_to_sign) {
+std::string minio::signer::GetSignature(const std::string & signing_key,
+                                        const std::string & string_to_sign) {
   std::string hash = HmacHash(signing_key, string_to_sign);
   std::string signature;
   char buf[3];

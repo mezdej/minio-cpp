@@ -16,14 +16,14 @@
 #ifndef _MINIO_CREDS_PROVIDERS_H
 #define _MINIO_CREDS_PROVIDERS_H
 
-#include <INIReader.h>
+//#include <INIReader.h>//removed
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include "json.hpp"
 #include <string>
 
 #include "credentials.h"
@@ -37,6 +37,10 @@
 namespace minio {
 namespace creds {
 struct Jwt {
+    Jwt() = default;
+    Jwt( const std::string& token_, unsigned int expiry_ = 0)
+        : token( token_ ), expiry( expiry_ )
+    {}
   std::string token;
   unsigned int expiry = 0;
 
@@ -166,7 +170,8 @@ class EnvMinioProvider : public Provider {
   Credentials Fetch() { return creds_; }
 };  // class EnvMinioProvider
 
-class AwsConfigProvider : public Provider {
+// uncomment AwsConfigProvider and INIReader.h if you want that functionality
+/*class AwsConfigProvider : public Provider {
  public:
   AwsConfigProvider(std::string filename = "", std::string profile = "") {
     if (filename.empty()) {
@@ -191,7 +196,7 @@ class AwsConfigProvider : public Provider {
   }
 
   Credentials Fetch() { return creds_; }
-};  // class AwsConfigProvider
+}; */ // class AwsConfigProvider
 
 class MinioClientConfigProvider : public Provider {
  public:
@@ -482,9 +487,10 @@ class IamAwsProvider : public Provider {
         }
       }
 
+
       WebIdentityProvider provider = WebIdentityProvider(
-          [&token_file = token_file_]() -> Jwt {
-            std::ifstream ifs(token_file);
+          [this]() -> Jwt {
+            std::ifstream ifs(token_file_);
             nlohmann::json json = nlohmann::json::parse(ifs);
             ifs.close();
             return Jwt{json["access_token"], json["expires_in"]};

@@ -15,34 +15,38 @@
 
 #include "client.h"
 
-int main(int argc, char* argv[]) {
-  // Create S3 base URL.
-  minio::s3::BaseUrl base_url("play.min.io");
+int main( int argc, char* argv[] )
+{
+    std::string host = "test.liza-notes.pl";
+    minio::s3::BaseUrl base_url( host, false );
+    base_url.port = 9000;
 
-  // Create credential provider.
-  minio::creds::StaticProvider provider(
-      "Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG");
+    minio::creds::StaticProvider provider(
+        "debil",
+        "Robocze1234" );//*/
 
-  // Create S3 client.
-  minio::s3::Client client(base_url, &provider);
+    // Create S3 client.
+    //minio::s3::Client client( base_url, &provider );
+    minio::s3::Client client( base_url, &provider );
 
-  // Create upload object arguments.
-  minio::s3::UploadObjectArgs args;
-  args.bucket = "my-bucket";
-  args.object = "my-object";
-  args.filename = "my-object.csv";
+    std::string bucket_name = "kupa";
 
-  // Call upload object.
-  minio::s3::UploadObjectResponse resp = client.UploadObject(args);
+    // Upload '/home/user/Photos/asiaphotos.zip' as object name to bucket.
+    minio::s3::UploadObjectArgs args;
+    args.bucket = bucket_name;
+    args.object = "asd/photos-2026.txt";
+    args.filename = "/home/mezdej/dupa";
 
-  // Handle response.
-  if (resp) {
-    std::cout << "my-object.csv is successfully uploaded to my-object"
-              << std::endl;
-  } else {
-    std::cout << "unable to upload object; " << resp.Error().String()
-              << std::endl;
-  }
+    minio::s3::UploadObjectResponse resp = client.UploadObject( args );
+    if( !resp )
+    {
+        std::cout << "unable to upload object; " << resp.Error() << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::time_t result = std::time( nullptr );
+    std::cout << "'" << args.filename << "' is successfully uploaded as "
+        << "object '" << args.object << "' to bucket '" << args.bucket << "'."
+        << " " << std::asctime( std::localtime( &result ) ) << std::endl;
 
-  return 0;
+    return EXIT_SUCCESS;
 }

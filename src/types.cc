@@ -14,9 +14,168 @@
 // limitations under the License.
 
 #include "types.h"
+namespace minio {
+    namespace s3 {
+        /*constexpr*/ bool IsRetentionModeValid( RetentionMode& retention )
+        {
+            switch( retention )
+            {
+            case RetentionMode::kGovernance:
+            case RetentionMode::kCompliance:
+                return true;
+            }
+            return false;
+        }
+
+        // RetentionModeToString converts retention mode enum to string.
+        /*constexpr*/ const char* RetentionModeToString( RetentionMode& retention ) throw()
+        {
+            switch( retention )
+            {
+            case RetentionMode::kGovernance:
+                return "GOVERNANCE";
+            case RetentionMode::kCompliance:
+                return "COMPLIANCE";
+            default:
+            {
+                std::cerr << "ABORT: Unknown retention mode. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        /*constexpr*/ bool IsLegalHoldValid( LegalHold& legal_hold )
+        {
+            switch( legal_hold )
+            {
+            case LegalHold::kOn:
+            case LegalHold::kOff:
+                return true;
+            }
+            return false;
+        }
+
+        // LegalHoldToString converts legal hold enum to string.
+        /*constexpr*/ const char* LegalHoldToString( LegalHold& legal_hold ) throw()
+        {
+            switch( legal_hold )
+            {
+            case LegalHold::kOn:
+                return "ON";
+            case LegalHold::kOff:
+                return "OFF";
+            default:
+            {
+                std::cerr << "ABORT: Unknown legal hold. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        /*constexpr*/ const char* DirectiveToString( Directive& directive ) throw()
+        {
+            switch( directive )
+            {
+            case Directive::kCopy:
+                return "COPY";
+            case Directive::kReplace:
+                return "REPLACE";
+            default:
+            {
+                std::cerr << "ABORT: Unknown directive. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        /*constexpr*/ const char* CompressionTypeToString( CompressionType& ctype ) throw()
+        {
+            switch( ctype )
+            {
+            case CompressionType::kNone:
+                return "NONE";
+            case CompressionType::kGZip:
+                return "GZIP";
+            case CompressionType::kBZip2:
+                return "BZIP2";
+            default:
+            {
+                std::cerr << "ABORT: Unknown compression type. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        /*constexpr*/ const char* FileHeaderInfoToString( FileHeaderInfo& info ) throw()
+        {
+            switch( info )
+            {
+            case FileHeaderInfo::kUse:
+                return "USE";
+            case FileHeaderInfo::kIgnore:
+                return "IGNORE";
+            case FileHeaderInfo::kNone:
+                return "NONE";
+            default:
+            {
+                std::cerr << "ABORT: Unknown file header info. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        /*constexpr*/ const char* JsonTypeToString( JsonType& jtype ) throw()
+        {
+            switch( jtype )
+            {
+            case JsonType::kDocument:
+                return "DOCUMENT";
+            case JsonType::kLines:
+                return "LINES";
+            default:
+            {
+                std::cerr << "ABORT: Unknown JSON type. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+        // QuoteFieldsToString converts quote fields enum to string.
+        /*constexpr*/ const char* QuoteFieldsToString( QuoteFields& qtype ) throw()
+        {
+            switch( qtype )
+            {
+            case QuoteFields::kAlways:
+                return "ALWAYS";
+            case QuoteFields::kAsNeeded:
+                return "ASNEEDED";
+            default:
+            {
+                std::cerr << "ABORT: Unknown quote fields. This should not happen."
+                    << std::endl;
+                std::terminate();
+            }
+            }
+            return NULL;
+        }
+
+    }//s3
+}//minio
 
 minio::s3::RetentionMode minio::s3::StringToRetentionMode(
-    std::string_view str) throw() {
+    const std::string & str) throw() {
   if (str == "GOVERNANCE") return RetentionMode::kGovernance;
   if (str == "COMPLIANCE") return RetentionMode::kCompliance;
 
@@ -28,7 +187,7 @@ minio::s3::RetentionMode minio::s3::StringToRetentionMode(
 }
 
 minio::s3::LegalHold minio::s3::StringToLegalHold(
-    std::string_view str) throw() {
+    const std::string & str) throw() {
   if (str == "ON") return LegalHold::kOn;
   if (str == "OFF") return LegalHold::kOff;
 
@@ -40,7 +199,7 @@ minio::s3::LegalHold minio::s3::StringToLegalHold(
 }
 
 minio::s3::Directive minio::s3::StringToDirective(
-    std::string_view str) throw() {
+    const std::string & str) throw() {
   if (str == "COPY") return Directive::kCopy;
   if (str == "REPLACE") return Directive::kReplace;
 
@@ -406,7 +565,9 @@ std::string minio::s3::ReplicationConfig::ToXML() {
           ss << prefix_xml(rule.filter.and_operator.prefix.Get());
         }
         if (!rule.filter.and_operator.tags.empty()) {
-          for (auto& [key, value] : rule.filter.and_operator.tags) {
+          for (auto& tag : rule.filter.and_operator.tags) {
+              auto& key = tag.first;
+              auto& value = tag.second;
             ss << tag_xml(key, value);
           }
         }
@@ -531,7 +692,9 @@ std::string minio::s3::LifecycleConfig::ToXML() {
         ss << "<Prefix>" << rule.filter.and_operator.prefix << "</Prefix>";
       }
       if (!rule.filter.and_operator.tags.empty()) {
-        for (auto& [key, value] : rule.filter.and_operator.tags) {
+        for (auto& tag : rule.filter.and_operator.tags) {
+            auto& key = tag.first;
+            auto& value = tag.second;
           ss << "<Tag>"
              << "<Key>" << key << "</Key>"
              << "<Value>" << value << "</Value>"

@@ -39,7 +39,7 @@ class Sse {
 
 class SseCustomerKey : public Sse {
  public:
-  SseCustomerKey(std::string_view key) {
+  SseCustomerKey(const std::string & key) {
     std::string b64key = utils::Base64Encode(key);
     std::string md5key = utils::Md5sumHash(key);
 
@@ -62,7 +62,7 @@ class SseCustomerKey : public Sse {
 
 class SseKms : public Sse {
  public:
-  SseKms(std::string_view key, std::string_view context) {
+  SseKms(const std::string & key, const std::string & context) {
     this->headers_.Add("X-Amz-Server-Side-Encryption-Aws-Kms-Key-Id",
                        std::string(key));
     this->headers_.Add("X-Amz-Server-Side-Encryption", "aws:kms");

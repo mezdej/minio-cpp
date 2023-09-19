@@ -29,7 +29,7 @@ macro(set_globals)
 endmacro()
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -43,12 +43,12 @@ ENDIF (${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 # Look for required libraries
 SET(requiredlibs)
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Werror")
-  IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0 AND NOT MINGW)
-    list(APPEND requiredlibs stdc++fs)
-  ENDIF()
-ENDIF()
+#IF(CMAKE_COMPILER_IS_GNUCC)
+  #set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Werror")
+  #IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0 AND NOT MINGW)
+    #list(APPEND requiredlibs stdc++fs)
+  #ENDIF()
+#ENDIF()
 
 find_package(CURL REQUIRED)
 IF(CURL_FOUND)
@@ -61,14 +61,20 @@ ENDIF(CURL_FOUND)
 find_package(unofficial-curlpp CONFIG REQUIRED)
 list(APPEND requiredlibs unofficial::curlpp::curlpp)
 
-find_package(unofficial-inih CONFIG REQUIRED)
-list(APPEND requiredlibs unofficial::inih::inireader)
+#find_package(unofficial-inih CONFIG REQUIRED)
+#list(APPEND requiredlibs unofficial::inih::inireader)
 
-find_package(nlohmann_json CONFIG REQUIRED)
-list(APPEND requiredlibs nlohmann_json::nlohmann_json)
+#find_package(nlohmann_json CONFIG REQUIRED)
+#list(APPEND requiredlibs nlohmann_json::nlohmann_json)
 
 find_package(pugixml CONFIG REQUIRED)
 list(APPEND requiredlibs pugixml)
+
+set(Boost_USE_STATIC_LIBS ON) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME ON) 
+find_package(Boost COMPONENTS system filesystem REQUIRED) 
+list(APPEND requiredlibs Boost::boost ${Boost_FILESYSTEM_LIBRARY})
 
 find_package(OpenSSL REQUIRED)
 IF(OPENSSL_FOUND)

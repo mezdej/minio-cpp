@@ -15,6 +15,11 @@
 
 #include "args.h"
 
+///*constexpr*/ const unsigned int kDefaultExpirySeconds = (60 * 60 * 24 * 7);  // 7 days
+/*constexpr*/ const char* minio::s3::PostPolicy::eq_ = "eq";
+/*constexpr*/ const char* minio::s3::PostPolicy::starts_with_ = "starts-with";
+/*constexpr*/ const char* minio::s3::PostPolicy::algorithm_ = "AWS4-HMAC-SHA256";
+
 minio::error::Error minio::s3::BucketArgs::Validate() {
   return utils::CheckBucketName(bucket);
 }
@@ -37,7 +42,9 @@ minio::utils::Multimap minio::s3::ObjectWriteArgs::Headers() {
   if (sse != NULL) headers.AddAll(sse->Headers());
 
   std::string tagging;
-  for (auto& [key, value] : tags) {
+  for (auto& current : tags) {
+      auto& key = current.first;
+      auto& value = current.second;
     std::string tag = curlpp::escape(key) + "=" + curlpp::escape(value);
     if (!tagging.empty()) tagging += "&";
     tagging += tag;
@@ -169,7 +176,7 @@ minio::error::Error minio::s3::DownloadObjectArgs::Validate() {
     return error::Error("filename cannot be empty");
   }
 
-  if (!overwrite && std::filesystem::exists(filename)) {
+  if (!overwrite && boost::filesystem::exists(filename)) {
     return error::Error("file " + filename + " already exists");
   }
 
@@ -346,12 +353,12 @@ minio::error::Error minio::s3::UploadObjectArgs::Validate() {
     return error::Error("filename cannot be empty");
   }
 
-  if (!std::filesystem::exists(filename)) {
+  if (!boost::filesystem::exists(filename)) {
     return error::Error("file " + filename + " does not exist");
   }
 
-  std::filesystem::path file_path = filename;
-  size_t obj_size = std::filesystem::file_size(file_path);
+  boost::filesystem::path file_path = filename;
+  size_t obj_size = boost::filesystem::file_size(file_path);
   object_size = obj_size;
   return utils::CalcPartInfo(object_size, part_size, part_count);
 }
@@ -429,7 +436,9 @@ minio::error::Error minio::s3::SetBucketTagsArgs::Validate() {
                         std::to_string(tags.size()));
   }
 
-  for (auto& [key, value] : tags) {
+  for (auto& tag : tags) {
+      auto& key = tag.first;
+      auto& value = tag.second;
     if (key.length() == 0 || key.length() > 128 || utils::Contains(key, "&")) {
       return error::Error("invalid tag key '" + key + "'");
     }
@@ -455,7 +464,9 @@ minio::error::Error minio::s3::SetObjectTagsArgs::Validate() {
                         std::to_string(tags.size()));
   }
 
-  for (auto& [key, value] : tags) {
+  for (auto& tag : tags) {
+      auto & key = tag.first;
+      auto & value = tag.second;
     if (key.length() == 0 || key.length() > 128 || utils::Contains(key, "&")) {
       return error::Error("invalid tag key '" + key + "'");
     }
