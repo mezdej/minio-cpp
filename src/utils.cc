@@ -19,12 +19,12 @@ const std::string WEEK_DAYS[] = {"Sun", "Mon", "Tue", "Wed",
                                  "Thu", "Fri", "Sat"};
 const std::string MONTHS[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-const std::regex MULTI_SPACE_REGEX("( +)");
+const boost::regex MULTI_SPACE_REGEX("( +)");
 
-const std::regex BUCKET_NAME_REGEX("^[a-z0-9][a-z0-9\\.\\-]{1,61}[a-z0-9]$");
-const std::regex OLD_BUCKET_NAME_REGEX(
-    "^[a-z0-9][a-z0-9_\\.\\-\\:]{1,61}[a-z0-9]$", std::regex_constants::icase);
-const std::regex IPV4_REGEX(
+const boost::regex BUCKET_NAME_REGEX("^[a-z0-9][a-z0-9\\.\\-]{1,61}[a-z0-9]$");
+const boost::regex OLD_BUCKET_NAME_REGEX(
+    "^[a-z0-9][a-z0-9_\\.\\-\\:]{1,61}[a-z0-9]$", boost::regex_constants::icase);
+const boost::regex IPV4_REGEX(
     "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}"
     "(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$");
 
@@ -425,7 +425,7 @@ void minio::utils::Multimap::GetCanonicalHeaders(
     std::string value;
     for (auto& v : values) {
       if (!value.empty()) value += ",";
-      value += std::regex_replace(v, MULTI_SPACE_REGEX, " ");
+      value += boost::regex_replace(v, MULTI_SPACE_REGEX, " ");
     }
 
     map[key] = value;
@@ -476,7 +476,7 @@ minio::error::Error minio::utils::CheckBucketName(const std::string & bucket_nam
     return error::Error("Bucket name cannot be greater than 63 characters");
   }
 
-  if (std::regex_match(bucket_name.data(), IPV4_REGEX)) {
+  if (boost::regex_match(bucket_name.data(), IPV4_REGEX)) {
     return error::Error("bucket name cannot be an IP address");
   }
 
@@ -489,10 +489,10 @@ minio::error::Error minio::utils::CheckBucketName(const std::string & bucket_nam
   }
 
   if (strict) {
-    if (!std::regex_match(bucket_name.data(), BUCKET_NAME_REGEX)) {
+    if (!boost::regex_match(bucket_name.data(), BUCKET_NAME_REGEX)) {
       return error::Error("bucket name does not follow S3 standards strictly");
     }
-  } else if (!std::regex_match(bucket_name.data(), OLD_BUCKET_NAME_REGEX)) {
+  } else if (!boost::regex_match(bucket_name.data(), OLD_BUCKET_NAME_REGEX)) {
     return error::Error("bucket name does not follow S3 standards");
   }
 

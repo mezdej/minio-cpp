@@ -28,27 +28,27 @@ const std::string AWS_S3_PREFIX =
     "((?!s3)(?!-)(?!_)[a-z_\\d-]{1,63}\\.)"
     "s3-control(-(?!_)[a-z_\\d]+)*\\.|"
     "(s3(-(?!_)[a-z_\\d]+)*\\.))";
-const std::regex HOSTNAME_REGEX(
+const boost::regex HOSTNAME_REGEX(
     "^((?!-)(?!_)[a-z_\\d-]{1,63}\\.)*"
     "((?!_)(?!-)[a-z_\\d-]{1,63})$",
-    std::regex_constants::icase);
-const std::regex AWS_ENDPOINT_REGEX(".*\\.amazonaws\\.com(|\\.cn)$",
-                                    std::regex_constants::icase);
-const std::regex AWS_S3_ENDPOINT_REGEX(
+    boost::regex::icase);
+const boost::regex AWS_ENDPOINT_REGEX(".*\\.amazonaws\\.com(|\\.cn)$",
+                                    boost::regex_constants::icase);
+const boost::regex AWS_S3_ENDPOINT_REGEX(
     AWS_S3_PREFIX + "((?!s3)(?!-)(?!_)[a-z_\\d-]{1,63}\\.)*" +
         "amazonaws\\.com(|\\.cn)$",
-    std::regex_constants::icase);
-const std::regex AWS_ELB_ENDPOINT_REGEX(
+    boost::regex_constants::icase);
+const boost::regex AWS_ELB_ENDPOINT_REGEX(
     "^(?!-)(?!_)[a-z_\\d-]{1,63}\\."
     "(?!-)(?!_)[a-z_\\d-]{1,63}\\."
     "elb\\.amazonaws\\.com$",
-    std::regex_constants::icase);
-const std::regex AWS_S3_PREFIX_REGEX(AWS_S3_PREFIX,
-                                     std::regex_constants::icase);
-const std::regex REGION_REGEX("^((?!_)(?!-)[a-z_\\d-]{1,63})$",
-                              std::regex_constants::icase);
+    boost::regex_constants::icase);
+const boost::regex AWS_S3_PREFIX_REGEX(AWS_S3_PREFIX,
+                                     boost::regex_constants::icase);
+const boost::regex REGION_REGEX("^((?!_)(?!-)[a-z_\\d-]{1,63})$",
+                              boost::regex_constants::icase);
 
-bool awsRegexMatch(const std::string & value, std::regex regex);
+bool awsRegexMatch(const std::string & value, const boost::regex& regex);
 
 error::Error getAwsInfo(std::string host, bool https, std::string& region,
                         std::string& aws_s3_prefix,

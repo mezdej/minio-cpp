@@ -18,8 +18,8 @@
 #define EMPTY_SHA256 \
   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
-bool minio::s3::awsRegexMatch(const std::string & value, std::regex regex) {
-  if (!std::regex_search(value.data(), regex)) return false;
+bool minio::s3::awsRegexMatch(const std::string & value, const boost::regex & expression) {
+  if (!boost::regex_search(value.data(), expression )) return false;
 
   std::stringstream str_stream(value.data());
   std::string token;
@@ -50,8 +50,8 @@ minio::error::Error minio::s3::getAwsInfo(std::string host, bool https,
     return error::Error("invalid Amazon AWS host " + host);
   }
 
-  std::smatch match;
-  std::regex_search(host, match, AWS_S3_PREFIX_REGEX);
+  boost::smatch match;
+  boost::regex_search(host, match, AWS_S3_PREFIX_REGEX);
   aws_s3_prefix = host.substr(match.length());
 
   if (utils::Contains(aws_s3_prefix, "s3-accesspoint") && !https) {
